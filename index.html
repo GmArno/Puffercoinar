@@ -1,1 +1,1148 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>PuffCoin Airdrop</title>
+
+<!-- Telegram Web App SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Monetag SDK -->
+<script src='//libtl.com/sdk.js' data-zone='11020615' data-sdk='show_11020615'></script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+  :root {
+    --bg: #050d1a;
+    --bg2: #0a1628;
+    --card: #0f1f35;
+    --card2: #142540;
+    --accent: #00d4ff;
+    --accent2: #7b2fff;
+    --gold: #ffd700;
+    --green: #00ff88;
+    --red: #ff4466;
+    --text: #e8f4ff;
+    --muted: #5a7a9a;
+    --border: rgba(0,212,255,0.2);
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: 15px;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(0,212,255,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(123,47,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== TOP NAV ===== */
+  .top-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(5,13,26,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { font-family:'Orbitron',sans-serif; font-size:16px; font-weight:900; color:var(--accent); letter-spacing:1px; }
+  .logo span { color: var(--gold); }
+  .points-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+    border: 1px solid rgba(255,215,0,0.4);
+    border-radius: 20px; padding: 5px 12px;
+    font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700; color:var(--gold);
+  }
+  .points-badge .icon { font-size:16px; }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(5,13,26,0.97);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 4px; cursor: pointer; transition: all 0.2s;
+    background: none; border: none; color: var(--muted);
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-item .nav-icon { font-size: 22px; }
+  .nav-item.active .nav-icon { filter: drop-shadow(0 0 6px var(--accent)); }
+
+  /* ===== PAGES ===== */
+  .page { display: none; padding: 16px 16px 100px; position: relative; z-index: 1; }
+  .page.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-glow { box-shadow: var(--glow); }
+
+  /* ===== HERO ===== */
+  .hero {
+    text-align: center; padding: 24px 0 16px;
+  }
+  .coin-wrap {
+    width: 100px; height: 100px; margin: 0 auto 16px;
+    position: relative;
+  }
+  .coin {
+    width: 100px; height: 100px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff8c0, #ffd700 40%, #b8860b 80%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px;
+    box-shadow: 0 0 30px rgba(255,215,0,0.5), 0 0 60px rgba(255,215,0,0.2), inset 0 -4px 12px rgba(0,0,0,0.3);
+    animation: coinFloat 3s ease-in-out infinite;
+  }
+  @keyframes coinFloat {
+    0%,100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+  }
+  .hero h1 { font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; color:var(--accent); margin-bottom:6px; }
+  .hero p { color: var(--muted); font-size:14px; }
+
+  /* ===== STATS GRID ===== */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom:14px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; text-align: center;
+  }
+  .stat-val { font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; color:var(--accent); }
+  .stat-lbl { font-size:12px; color:var(--muted); margin-top:3px; }
+
+  /* ===== SECTION TITLE ===== */
+  .sec-title {
+    font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700;
+    color:var(--accent); letter-spacing:2px; text-transform:uppercase;
+    margin-bottom:12px; padding-left:4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ===== ACTION CARDS ===== */
+  .action-card {
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+  }
+  .action-card:active { transform: scale(0.97); }
+  .action-icon { font-size:28px; flex-shrink:0; }
+  .action-info { flex:1; }
+  .action-name { font-weight:700; font-size:15px; margin-bottom:2px; }
+  .action-desc { font-size:12px; color:var(--muted); }
+  .action-reward {
+    font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700;
+    color:var(--gold); white-space:nowrap;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-wrap { margin-top: 8px; }
+  .progress-label { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .progress-bar { height:6px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,var(--accent2),var(--accent)); transition:width 0.5s; }
+
+  /* ===== LIMIT BADGE ===== */
+  .limit-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:11px; color:var(--muted);
+    background:rgba(255,255,255,0.05); border-radius:8px; padding:3px 8px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    width:100%; padding:14px; border:none; border-radius:12px;
+    font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700;
+    cursor:pointer; transition:all 0.2s; letter-spacing:1px;
+  }
+  .btn-primary {
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    color:#fff;
+    box-shadow:0 4px 20px rgba(0,212,255,0.3);
+  }
+  .btn-primary:active { transform:scale(0.97); }
+  .btn-gold {
+    background:linear-gradient(135deg,#b8860b,#ffd700);
+    color:#000;
+  }
+  .btn-outline {
+    background:transparent; color:var(--accent);
+    border:1px solid var(--accent);
+  }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+  /* ===== NEWS PAGE ===== */
+  .news-card {
+    background:var(--card2); border:1px solid var(--border);
+    border-radius:14px; overflow:hidden; margin-bottom:12px;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .news-card:active { transform:scale(0.98); }
+  .news-img {
+    width:100%; height:140px; object-fit:cover;
+    background:linear-gradient(135deg,var(--card2),#1a2f4a);
+    display:flex; align-items:center; justify-content:center; font-size:48px;
+  }
+  .news-body { padding:12px 14px; }
+  .news-cat { font-size:11px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .news-title { font-size:15px; font-weight:700; margin-bottom:4px; line-height:1.3; }
+  .news-meta { font-size:11px; color:var(--muted); display:flex; gap:10px; align-items:center; }
+  .news-reward { margin-left:auto; color:var(--gold); font-weight:700; font-family:'Orbitron',sans-serif; font-size:12px; }
+
+  /* ===== ARTICLE VIEW ===== */
+  .article-view { display:none; }
+  .article-view.active { display:block; }
+  .back-btn {
+    display:flex; align-items:center; gap:6px;
+    background:none; border:none; color:var(--accent);
+    font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700;
+    cursor:pointer; margin-bottom:16px;
+  }
+  .article-title { font-family:'Orbitron',sans-serif; font-size:18px; font-weight:900; line-height:1.3; margin-bottom:12px; color:var(--accent); }
+  .article-body { font-size:15px; line-height:1.8; color:#b0c8e0; }
+  .article-body p { margin-bottom:14px; }
+  .complete-btn-wrap { margin-top:20px; }
+  .timer-hint { text-align:center; font-size:12px; color:var(--muted); margin-top:8px; }
+
+  /* ===== QUIZ ===== */
+  .quiz-header { margin-bottom:16px; }
+  .quiz-q-num { font-size:12px; color:var(--accent); font-family:'Orbitron',sans-serif; font-weight:700; margin-bottom:8px; }
+  .quiz-question { font-size:17px; font-weight:700; line-height:1.4; margin-bottom:20px; }
+  .quiz-options { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+  .quiz-opt {
+    padding:14px 16px; background:var(--card2); border:1px solid var(--border);
+    border-radius:12px; cursor:pointer; transition:all 0.2s;
+    font-size:15px; font-weight:600;
+  }
+  .quiz-opt:active { transform:scale(0.98); }
+  .quiz-opt.selected { border-color:var(--accent); background:rgba(0,212,255,0.1); color:var(--accent); }
+  .quiz-opt.correct { border-color:var(--green); background:rgba(0,255,136,0.1); color:var(--green); }
+  .quiz-opt.wrong { border-color:var(--red); background:rgba(255,68,102,0.1); color:var(--red); }
+  .quiz-progress-wrap { margin-bottom:16px; }
+
+  /* ===== REFERRAL ===== */
+  .ref-code-box {
+    background:var(--bg); border:1px solid var(--accent);
+    border-radius:12px; padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .ref-code { font-family:'Orbitron',sans-serif; font-size:15px; color:var(--accent); font-weight:700; letter-spacing:2px; }
+  .copy-btn {
+    background:rgba(0,212,255,0.15); border:1px solid var(--accent);
+    color:var(--accent); padding:6px 14px; border-radius:8px;
+    font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .ref-item {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 14px; background:var(--card2);
+    border:1px solid var(--border); border-radius:12px; margin-bottom:8px;
+  }
+  .ref-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .ref-name { font-weight:700; font-size:14px; }
+  .ref-pts { font-size:12px; color:var(--muted); }
+  .ref-earned { font-family:'Orbitron',sans-serif; font-size:12px; color:var(--gold); margin-left:auto; }
+
+  /* ===== WITHDRAW ===== */
+  .wd-card {
+    background:linear-gradient(135deg,rgba(123,47,255,0.2),rgba(0,212,255,0.1));
+    border:1px solid rgba(123,47,255,0.4);
+    border-radius:16px; padding:20px; margin-bottom:16px; text-align:center;
+  }
+  .wd-balance { font-family:'Orbitron',sans-serif; font-size:32px; font-weight:900; color:var(--gold); }
+  .wd-label { font-size:13px; color:var(--muted); margin-top:4px; }
+  .wd-info { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .wd-row { display:flex; justify-content:space-between; font-size:14px; padding:10px 14px; background:var(--card2); border-radius:10px; }
+  .wd-key { color:var(--muted); }
+  .wd-val { font-weight:700; color:var(--text); }
+  .input-field {
+    width:100%; background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:13px 16px; color:var(--text);
+    font-family:'Rajdhani',sans-serif; font-size:15px; margin-bottom:10px;
+    outline:none;
+  }
+  .input-field:focus { border-color:var(--accent); }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:10px 20px;
+    font-weight:700; font-size:14px; color:var(--text);
+    opacity:0; pointer-events:none; transition:all 0.3s; z-index:999;
+    white-space:nowrap;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ===== REWARD POPUP ===== */
+  .reward-overlay {
+    position:fixed; inset:0; z-index:500;
+    background:rgba(0,0,0,0.85);
+    display:none; align-items:center; justify-content:center;
+  }
+  .reward-overlay.show { display:flex; }
+  .reward-box {
+    background:var(--card2); border:1px solid var(--gold);
+    border-radius:20px; padding:32px 24px; text-align:center;
+    max-width:300px; width:90%;
+    box-shadow:0 0 40px rgba(255,215,0,0.3);
+    animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+  .reward-icon { font-size:56px; margin-bottom:12px; }
+  .reward-title { font-family:'Orbitron',sans-serif; font-size:20px; font-weight:900; color:var(--gold); margin-bottom:8px; }
+  .reward-amount { font-family:'Orbitron',sans-serif; font-size:32px; font-weight:900; color:var(--green); margin-bottom:16px; }
+
+  /* ===== COOLDOWN ===== */
+  .cooldown-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,68,102,0.15); border:1px solid var(--red);
+    border-radius:10px; padding:6px 12px; font-size:13px; color:var(--red); font-weight:700;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  .shimmer {
+    background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);
+    background-size:200% 100%;
+    animation:shimmer 1.5s infinite;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  .pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo">Puff<span>Coin</span></div>
+  <div class="points-badge"><span class="icon">🪙</span><span id="totalPoints">0</span> pts</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- REWARD OVERLAY -->
+<div class="reward-overlay" id="rewardOverlay">
+  <div class="reward-box">
+    <div class="reward-icon">🎉</div>
+    <div class="reward-title">REWARD!</div>
+    <div class="reward-amount" id="rewardAmt">+200 pts</div>
+    <button class="btn btn-gold" onclick="closeReward()">CLAIM</button>
+  </div>
+</div>
+
+<!-- ========== HOME PAGE ========== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="coin-wrap"><div class="coin">🐡</div></div>
+    <h1>PuffCoin Airdrop</h1>
+    <p>Earn points, complete tasks, get rewards!</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val" id="homePoints">0</div>
+      <div class="stat-lbl">Your Points</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="homeRefs">0</div>
+      <div class="stat-lbl">Referrals</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="homeNews">0</div>
+      <div class="stat-lbl">News Read</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="homeQuiz">0</div>
+      <div class="stat-lbl">Quiz Done</div>
+    </div>
+  </div>
+
+  <div class="sec-title">Quick Actions</div>
+
+  <div class="action-card" onclick="switchPage('news')">
+    <div class="action-icon">📰</div>
+    <div class="action-info">
+      <div class="action-name">Read News</div>
+      <div class="action-desc">Read articles & earn coins</div>
+      <div id="newsLimitBadge" class="limit-badge" style="margin-top:5px">📰 <span id="newsLeft">25</span>/25 today</div>
+    </div>
+    <div class="action-reward">+200 pts</div>
+  </div>
+
+  <div class="action-card" onclick="switchPage('quiz')">
+    <div class="action-icon">🧠</div>
+    <div class="action-info">
+      <div class="action-name">Play Quiz</div>
+      <div class="action-desc">Answer questions & win</div>
+      <div id="quizLimitBadge" class="limit-badge" style="margin-top:5px">🧠 <span id="quizLeft">20</span>/20 today</div>
+    </div>
+    <div class="action-reward">+100 pts</div>
+  </div>
+
+  <div class="action-card" onclick="switchPage('referral')">
+    <div class="action-icon">👥</div>
+    <div class="action-info">
+      <div class="action-name">Invite Friends</div>
+      <div class="action-desc">Earn 500 pts per referral</div>
+    </div>
+    <div class="action-reward">+500 pts</div>
+  </div>
+
+  <div class="action-card" onclick="switchPage('withdraw')">
+    <div class="action-icon">💸</div>
+    <div class="action-info">
+      <div class="action-name">Withdraw</div>
+      <div class="action-desc">Convert points to crypto</div>
+    </div>
+    <div class="action-reward">→</div>
+  </div>
+</div>
+
+<!-- ========== NEWS PAGE ========== -->
+<div class="page" id="page-news">
+
+  <!-- News List -->
+  <div id="newsListView">
+    <div class="sec-title">Latest News</div>
+    <div id="newsCooldown" style="display:none;margin-bottom:12px;text-align:center">
+      <span class="cooldown-badge">⏳ Resets in <span id="newsCooldownTime">--:--</span></span>
+    </div>
+    <div id="newsList"></div>
+  </div>
+
+  <!-- Article View -->
+  <div id="articleView" style="display:none">
+    <button class="back-btn" onclick="closeArticle()">← Back</button>
+    <div class="article-title" id="articleTitle"></div>
+    <div class="article-body" id="articleBody"></div>
+    <div class="complete-btn-wrap" id="completeBtnWrap" style="display:none">
+      <button class="btn btn-primary" id="completeBtn" onclick="completeArticle()">✅ Complete & Earn 200 pts</button>
+      <div class="timer-hint" id="completeHint">Read for 30 seconds to unlock</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== QUIZ PAGE ========== -->
+<div class="page" id="page-quiz">
+  <div class="sec-title">Daily Quiz</div>
+  <div id="quizCooldown" style="display:none;margin-bottom:12px;text-align:center">
+    <span class="cooldown-badge">⏳ Resets in <span id="quizCooldownTime">--:--</span></span>
+  </div>
+  <div id="quizContainer">
+    <div class="quiz-progress-wrap">
+      <div class="progress-label"><span id="quizProgress">Question 1/5</span><span id="quizScore">Score: 0</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="quizProgressFill" style="width:20%"></div></div>
+    </div>
+    <div class="quiz-q-num" id="quizQNum">Q1</div>
+    <div class="quiz-question" id="quizQuestion">Loading...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <button class="btn btn-primary" id="quizNextBtn" onclick="quizNext()" disabled>Next Question →</button>
+    <div class="timer-hint" style="margin-top:8px;text-align:center">+100 pts per question</div>
+  </div>
+</div>
+
+<!-- ========== REFERRAL PAGE ========== -->
+<div class="page" id="page-referral">
+  <div class="sec-title">Referral Program</div>
+
+  <div class="card card-glow" style="text-align:center;margin-bottom:16px">
+    <div style="font-size:36px;margin-bottom:8px">👥</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;color:var(--gold)" id="refEarned">0</div>
+    <div style="color:var(--muted);font-size:13px;margin-top:4px">Points from Referrals</div>
+  </div>
+
+  <div class="sec-title">Your Referral Link</div>
+  <div class="ref-code-box">
+    <div class="ref-code" id="refCode">PUFF-XXXX</div>
+    <button class="copy-btn" onclick="copyRef()">📋 Copy</button>
+  </div>
+  <button class="btn btn-primary" style="margin-bottom:16px" onclick="shareRef()">📤 Share & Earn 500 pts</button>
+
+  <div class="sec-title">Your Referrals (<span id="refCount">0</span>)</div>
+  <div id="refList">
+    <div style="text-align:center;color:var(--muted);padding:20px">No referrals yet.<br>Share your link to start earning!</div>
+  </div>
+</div>
+
+<!-- ========== WITHDRAW PAGE ========== -->
+<div class="page" id="page-withdraw">
+  <div class="sec-title">Withdraw</div>
+
+  <div class="wd-card">
+    <div class="wd-balance" id="wdBalance">0</div>
+    <div class="wd-label">🪙 Available Points</div>
+  </div>
+
+  <div class="wd-info">
+    <div class="wd-row"><span class="wd-key">Min Withdrawal</span><span class="wd-val">10,000 pts</span></div>
+    <div class="wd-row"><span class="wd-key">Rate</span><span class="wd-val">10,000 pts = 1 USDT</span></div>
+    <div class="wd-row"><span class="wd-key">Network</span><span class="wd-val">TON / TRC20</span></div>
+    <div class="wd-row"><span class="wd-key">Processing</span><span class="wd-val">1-3 Business Days</span></div>
+  </div>
+
+  <div class="sec-title">Submit Request</div>
+  <input class="input-field" id="wdWallet" placeholder="Your TON/TRC20 Wallet Address" />
+  <input class="input-field" id="wdAmount" type="number" placeholder="Points to withdraw (min 10,000)" />
+  <button class="btn btn-gold" onclick="submitWithdraw()">💸 Request Withdrawal</button>
+
+  <div style="margin-top:16px" id="wdHistory">
+    <div class="sec-title">History</div>
+    <div id="wdList">
+      <div style="text-align:center;color:var(--muted);padding:16px;font-size:13px">No withdrawal history yet.</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchPage('home')" id="nav-home">
+    <span class="nav-icon">🏠</span><span>Home</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('news')" id="nav-news">
+    <span class="nav-icon">📰</span><span>News</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('quiz')" id="nav-quiz">
+    <span class="nav-icon">🧠</span><span>Quiz</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('referral')" id="nav-referral">
+    <span class="nav-icon">👥</span><span>Refer</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('withdraw')" id="nav-withdraw">
+    <span class="nav-icon">💸</span><span>Earn</span>
+  </button>
+</nav>
+
+<script>
+// ============================================================
+//  STATE
+// ============================================================
+const STATE = {
+  points: 0,
+  newsReadToday: 0,
+  quizDoneToday: 0,
+  newsResetAt: null,
+  quizResetAt: null,
+  referrals: [],
+  withdrawHistory: [],
+  quizSessionCount: 0,
+  currentQuizIndex: 0,
+  quizScore: 0,
+  articleTimers: {},
+  tgUser: null,
+};
+
+const NEWS_LIMIT = 25;
+const QUIZ_LIMIT = 20;
+const NEWS_COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 hours
+const QUIZ_COOLDOWN_MS = 1 * 60 * 60 * 1000; // 1 hour
+
+// ============================================================
+//  TELEGRAM INIT
+// ============================================================
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  if (tg.initDataUnsafe?.user) {
+    STATE.tgUser = tg.initDataUnsafe.user;
+  }
+}
+
+function getUserId() {
+  return STATE.tgUser?.id || 'demo_user';
+}
+function getUsername() {
+  return STATE.tgUser?.first_name || STATE.tgUser?.username || 'PuffUser';
+}
+
+// ============================================================
+//  PERSIST
+// ============================================================
+function save() {
+  try { localStorage.setItem('puffcoin_' + getUserId(), JSON.stringify(STATE)); } catch(e){}
+}
+function load() {
+  try {
+    const raw = localStorage.getItem('puffcoin_' + getUserId());
+    if (raw) {
+      const saved = JSON.parse(raw);
+      Object.assign(STATE, saved);
+    }
+  } catch(e){}
+}
+
+// ============================================================
+//  AD FUNCTIONS
+// ============================================================
+function showInterstitialAd() {
+  try {
+    if (typeof show_11020615 !== 'undefined') {
+      show_11020615({
+        type: 'inApp',
+        inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
+      });
+    }
+  } catch(e) { console.log('Ad not loaded:', e); }
+}
+
+function showRewardedPopup(callback) {
+  try {
+    if (typeof show_11020615 !== 'undefined') {
+      show_11020615('pop').then(() => {
+        if (callback) callback();
+      }).catch(() => {
+        if (callback) callback();
+      });
+    } else {
+      if (callback) callback();
+    }
+  } catch(e) { if (callback) callback(); }
+}
+
+function showRewardedInterstitial(callback) {
+  try {
+    if (typeof show_11020615 !== 'undefined') {
+      show_11020615().then(() => {
+        if (callback) callback();
+      }).catch(() => {
+        if (callback) callback();
+      });
+    } else {
+      if (callback) callback();
+    }
+  } catch(e) { if (callback) callback(); }
+}
+
+// ============================================================
+//  TOAST & REWARD
+// ============================================================
+function showToast(msg, duration=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function showReward(pts, cb) {
+  document.getElementById('rewardAmt').textContent = '+' + pts + ' pts';
+  document.getElementById('rewardOverlay').classList.add('show');
+  window._rewardCb = cb;
+}
+
+function closeReward() {
+  document.getElementById('rewardOverlay').classList.remove('show');
+  if (window._rewardCb) { window._rewardCb(); window._rewardCb = null; }
+}
+
+function addPoints(pts) {
+  STATE.points += pts;
+  updateUI();
+  save();
+}
+
+// ============================================================
+//  NAVIGATION
+// ============================================================
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  updateUI();
+  if (name === 'news') renderNews();
+  if (name === 'quiz') initQuiz();
+  if (name === 'referral') renderReferral();
+  if (name === 'withdraw') renderWithdraw();
+}
+
+// ============================================================
+//  UPDATE UI
+// ============================================================
+function updateUI() {
+  document.getElementById('totalPoints').textContent = STATE.points.toLocaleString();
+  document.getElementById('homePoints').textContent = STATE.points.toLocaleString();
+  document.getElementById('homeRefs').textContent = STATE.referrals.length;
+  document.getElementById('homeNews').textContent = STATE.newsReadToday;
+  document.getElementById('homeQuiz').textContent = STATE.quizDoneToday;
+
+  // News limits
+  const newsLeft = Math.max(0, NEWS_LIMIT - STATE.newsReadToday);
+  document.getElementById('newsLeft').textContent = newsLeft;
+
+  // Quiz limits
+  const quizLeft = Math.max(0, QUIZ_LIMIT - STATE.quizDoneToday);
+  document.getElementById('quizLeft').textContent = quizLeft;
+}
+
+// ============================================================
+//  COOLDOWN HELPERS
+// ============================================================
+function isNewsCoolingDown() {
+  if (!STATE.newsResetAt) return false;
+  return Date.now() < STATE.newsResetAt;
+}
+function isQuizCoolingDown() {
+  if (!STATE.quizResetAt) return false;
+  return Date.now() < STATE.quizResetAt;
+}
+function formatCountdown(ms) {
+  if (ms <= 0) return '00:00';
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  if (h > 0) return h + 'h ' + String(m).padStart(2,'0') + 'm';
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+// ============================================================
+//  NEWS DATA
+// ============================================================
+const NEWS = [
+  { id:1, cat:'Crypto', emoji:'₿', title:'Bitcoin Hits New All-Time High in 2025', reward:200,
+    body:`<p>Bitcoin has shattered its previous all-time high, surging past $150,000 as institutional adoption reaches unprecedented levels. Major corporations and sovereign wealth funds have been accumulating BTC aggressively this quarter.</p><p>Analysts point to the upcoming halving cycle and reduced exchange reserves as key catalysts. The fear and greed index hit extreme greed territory as retail investors flooded back into the market.</p><p>PuffCoin is positioned to benefit from this bullish momentum, with our airdrop participants set to receive tokens at a favorable valuation compared to the current market rates.</p><p>Long-term holders continue to demonstrate diamond hands, with on-chain metrics showing the lowest exchange balances in three years. This supply squeeze combined with rising demand has created the perfect storm for a price explosion.</p>`
+  },
+  { id:2, cat:'DeFi', emoji:'🦄', title:'DeFi TVL Surpasses $500 Billion Milestone', reward:200,
+    body:`<p>Decentralized finance has reached a historic milestone with total value locked across all protocols exceeding $500 billion for the first time. This represents a 10x increase from just two years ago.</p><p>Leading protocols like Uniswap, Aave, and Compound have seen explosive growth in user activity. Layer-2 solutions have dramatically reduced gas fees, making DeFi accessible to a broader audience.</p><p>The PuffCoin protocol integrates seamlessly with major DeFi platforms, allowing airdrop recipients to immediately put their tokens to work earning yield.</p><p>Cross-chain bridges and interoperability protocols have been instrumental in this growth, allowing liquidity to flow freely between Ethereum, Solana, TON, and other ecosystems.</p>`
+  },
+  { id:3, cat:'NFT', emoji:'🎨', title:'NFT Market Revival: A New Era of Digital Art', reward:200,
+    body:`<p>The NFT market is experiencing a powerful resurgence, with daily trading volumes returning to peak 2021 levels. However, this time around, the focus has shifted to utility-driven NFTs rather than pure speculation.</p><p>Gaming NFTs, membership tokens, and real-world asset representations are driving the recovery. Major brands from fashion, entertainment, and sports are launching innovative NFT experiences.</p><p>PuffCoin will launch an exclusive NFT collection for early airdrop participants, offering unique in-ecosystem benefits and governance rights within our expanding platform.</p><p>Collectors and investors are paying close attention to projects with real utility and strong community backing, exactly the principles that PuffCoin was built upon from day one.</p>`
+  },
+  { id:4, cat:'Blockchain', emoji:'⛓️', title:'TON Blockchain Breaks 10M Daily Active Users', reward:200,
+    body:`<p>The TON blockchain, integrated deeply with Telegram, has achieved a remarkable milestone: 10 million daily active users. This makes it one of the most used blockchain networks in the world.</p><p>Telegram's massive user base of over 900 million people has proven to be the perfect distribution channel for blockchain adoption. Mini apps and bots on the platform have driven unprecedented on-chain activity.</p><p>PuffCoin is built on the TON ecosystem, meaning our airdrop tokens will be instantly accessible to millions of Telegram users without the need for complex wallet setup processes.</p><p>Transaction fees on TON remain among the lowest in the industry, making microtransactions and reward distributions economically viable at scale.</p>`
+  },
+  { id:5, cat:'Market', emoji:'📈', title:'Altcoin Season Incoming: Experts Predict 10x Gains', reward:200,
+    body:`<p>Crypto market analysts are pointing to classic altcoin season indicators, suggesting that small and mid-cap tokens could see explosive gains of 10x or more in the coming months.</p><p>Historical patterns show that Bitcoin dominance peaks are typically followed by massive rotations into alternative cryptocurrencies. The current market structure mirrors the setup seen before previous altcoin seasons.</p><p>Early PuffCoin airdrop participants could be positioned to benefit enormously from this cycle, as new tokens with strong community backing often outperform established alternatives during bull markets.</p><p>Smart money is accumulating aggressively at current prices, with whale wallets showing significant buying activity across the altcoin spectrum over the past 30 days.</p>`
+  },
+  { id:6, cat:'Web3', emoji:'🌐', title:'Web3 Gaming Reaches 50M Players Worldwide', reward:200,
+    body:`<p>Web3 gaming has crossed the 50 million active player threshold, with play-to-earn and play-and-earn models attracting gamers from traditional gaming backgrounds who seek real ownership of in-game assets.</p><p>Leading titles are now offering experiences comparable to AAA traditional games, while providing the added benefit of true digital ownership. Players can trade, sell, and use their assets across compatible platforms.</p><p>PuffCoin's ecosystem roadmap includes a suite of mini-games within Telegram, allowing users to earn tokens through fun gameplay experiences directly accessible from our bot.</p><p>The convergence of gaming and DeFi, often called GameFi, is being seen as one of the most promising sectors for the next wave of mainstream crypto adoption.</p>`
+  },
+];
+
+let articleCompleteTimer = null;
+let articlePopupTimer = null;
+let currentArticleId = null;
+
+function renderNews() {
+  const list = document.getElementById('newsList');
+  const cooldownEl = document.getElementById('newsCooldown');
+
+  if (STATE.newsReadToday >= NEWS_LIMIT) {
+    if (isNewsCoolingDown()) {
+      cooldownEl.style.display = 'block';
+    } else {
+      STATE.newsReadToday = 0;
+      STATE.newsResetAt = null;
+      save();
+      cooldownEl.style.display = 'none';
+    }
+  } else {
+    cooldownEl.style.display = 'none';
+  }
+
+  list.innerHTML = '';
+  NEWS.forEach(n => {
+    const read = (STATE.articleTimers[n.id] === 'done');
+    const div = document.createElement('div');
+    div.className = 'news-card';
+    div.innerHTML = `
+      <div class="news-img" style="font-size:52px;display:flex;align-items:center;justify-content:center">${n.emoji}</div>
+      <div class="news-body">
+        <div class="news-cat">${n.cat}</div>
+        <div class="news-title">${n.title}</div>
+        <div class="news-meta">
+          <span>5 min read</span>
+          ${read ? '<span style="color:var(--green)">✅ Read</span>' : ''}
+          <span class="news-reward">+${n.reward} pts</span>
+        </div>
+      </div>`;
+    div.onclick = () => openArticle(n);
+    list.appendChild(div);
+  });
+}
+
+function openArticle(news) {
+  if (STATE.newsReadToday >= NEWS_LIMIT && isNewsCoolingDown()) {
+    showToast('⏳ Daily limit reached! Wait for reset.');
+    return;
+  }
+
+  // Show interstitial ad when clicking a news article
+  showInterstitialAd();
+
+  currentArticleId = news.id;
+  document.getElementById('newsListView').style.display = 'none';
+  document.getElementById('articleView').style.display = 'block';
+  document.getElementById('articleTitle').textContent = news.title;
+  document.getElementById('articleBody').innerHTML = news.body;
+
+  const completeBtnWrap = document.getElementById('completeBtnWrap');
+  const completeBtn = document.getElementById('completeBtn');
+  const completeHint = document.getElementById('completeHint');
+
+  completeBtnWrap.style.display = 'block';
+  completeBtn.disabled = true;
+  completeBtn.textContent = '⏳ Complete & Earn 200 pts (30s)';
+
+  let timeLeft = 30;
+  let popupShown = false;
+
+  const timer = setInterval(() => {
+    timeLeft--;
+    if (!popupShown && timeLeft <= 15) {
+      popupShown = true;
+      // Show rewarded popup at 15s
+      showRewardedPopup(null);
+    }
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      completeBtn.disabled = false;
+      completeBtn.textContent = '✅ Complete & Earn 200 pts';
+      completeHint.textContent = 'Tap to claim your reward!';
+    } else {
+      completeHint.textContent = `Read for ${timeLeft} more second${timeLeft!==1?'s':''} to unlock`;
+    }
+  }, 1000);
+
+  articleCompleteTimer = timer;
+}
+
+function closeArticle() {
+  if (articleCompleteTimer) { clearInterval(articleCompleteTimer); articleCompleteTimer = null; }
+  document.getElementById('newsListView').style.display = 'block';
+  document.getElementById('articleView').style.display = 'none';
+  currentArticleId = null;
+}
+
+function completeArticle() {
+  const btn = document.getElementById('completeBtn');
+  if (btn.disabled) return;
+
+  // Show rewarded interstitial, then reward
+  showRewardedInterstitial(() => {
+    if (STATE.articleTimers[currentArticleId] !== 'done') {
+      STATE.articleTimers[currentArticleId] = 'done';
+      STATE.newsReadToday++;
+      if (STATE.newsReadToday >= NEWS_LIMIT && !STATE.newsResetAt) {
+        STATE.newsResetAt = Date.now() + NEWS_COOLDOWN_MS;
+      }
+      addPoints(200);
+      showReward(200, () => {
+        closeArticle();
+        renderNews();
+        showToast('🎉 +200 PuffCoins earned!');
+      });
+    } else {
+      showToast('Already completed!');
+      closeArticle();
+    }
+  });
+}
+
+// ============================================================
+//  QUIZ
+// ============================================================
+const QUIZ_BANK = [
+  { q: 'What is Bitcoin\'s maximum supply?', opts: ['21 Million', '100 Million', 'Unlimited', '1 Billion'], ans: 0 },
+  { q: 'What does "DeFi" stand for?', opts: ['Decentralized Finance', 'Digital Finance', 'Distributed Fiat', 'Direct Fund'], ans: 0 },
+  { q: 'Which network is Telegram\'s native blockchain?', opts: ['Ethereum', 'Solana', 'TON', 'BNB Chain'], ans: 2 },
+  { q: 'What is a "Halving" in Bitcoin?', opts: ['Price drop 50%', 'Block reward cut in half', 'Network split', 'Exchange delisting'], ans: 1 },
+  { q: 'What does NFT stand for?', opts: ['New Financial Token', 'Non-Fungible Token', 'Network File Transfer', 'None of these'], ans: 1 },
+  { q: 'What is the smallest unit of Bitcoin?', opts: ['Bit', 'Milli', 'Satoshi', 'Wei'], ans: 2 },
+  { q: 'What is "gas" in Ethereum?', opts: ['Energy source', 'Transaction fee', 'Mining reward', 'Token type'], ans: 1 },
+  { q: 'What does HODL mean in crypto?', opts: ['Hold On for Dear Life', 'High Order Dollar Limit', 'Hash Output Digital Ledger', 'None'], ans: 0 },
+  { q: 'Which consensus is Bitcoin based on?', opts: ['Proof of Stake', 'Proof of Work', 'Delegated PoS', 'Proof of Space'], ans: 1 },
+  { q: 'What is a "seed phrase"?', opts: ['Plant metaphor', 'Wallet recovery words', 'Mining algorithm', 'Smart contract'], ans: 1 },
+  { q: 'What is a "smart contract"?', opts: ['Legal document', 'Self-executing code', 'Bank agreement', 'NFT license'], ans: 1 },
+  { q: 'What does TVL mean in DeFi?', opts: ['Total Value Locked', 'Token Vault Level', 'Time Value Limit', 'Transaction Volume Ledger'], ans: 0 },
+  { q: 'Which token standard is most common on Ethereum?', opts: ['BEP-20', 'ERC-20', 'TRC-20', 'TON-20'], ans: 1 },
+  { q: 'What is a "whale" in crypto?', opts: ['Large holder', 'Mining pool', 'Exchange', 'Stablecoin'], ans: 0 },
+  { q: 'What is "staking" in crypto?', opts: ['Betting on prices', 'Locking tokens to earn rewards', 'Mining', 'Trading strategy'], ans: 1 },
+];
+
+let shuffledQuiz = [];
+let selectedOpt = null;
+let quizAnswered = false;
+
+function initQuiz() {
+  if (STATE.quizDoneToday >= QUIZ_LIMIT && isQuizCoolingDown()) {
+    document.getElementById('quizCooldown').style.display = 'block';
+    document.getElementById('quizContainer').style.display = 'none';
+    return;
+  }
+  if (STATE.quizDoneToday >= QUIZ_LIMIT) {
+    STATE.quizDoneToday = 0;
+    STATE.quizResetAt = null;
+    save();
+  }
+  document.getElementById('quizCooldown').style.display = 'none';
+  document.getElementById('quizContainer').style.display = 'block';
+
+  if (shuffledQuiz.length === 0 || STATE.currentQuizIndex >= shuffledQuiz.length) {
+    shuffledQuiz = [...QUIZ_BANK].sort(() => Math.random() - 0.5);
+    STATE.currentQuizIndex = 0;
+    STATE.quizScore = 0;
+    STATE.quizSessionCount = 0;
+  }
+  loadQuizQuestion();
+}
+
+function loadQuizQuestion() {
+  selectedOpt = null;
+  quizAnswered = false;
+  const q = shuffledQuiz[STATE.currentQuizIndex % shuffledQuiz.length];
+  const num = (STATE.currentQuizIndex % 5) + 1;
+
+  document.getElementById('quizQNum').textContent = 'Q' + num;
+  document.getElementById('quizProgress').textContent = 'Question ' + num + '/5';
+  document.getElementById('quizScore').textContent = 'Score: ' + STATE.quizScore;
+  document.getElementById('quizProgressFill').style.width = (num * 20) + '%';
+  document.getElementById('quizQuestion').textContent = q.q;
+
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-opt';
+    div.textContent = opt;
+    div.onclick = () => selectOpt(i, q.ans, div);
+    opts.appendChild(div);
+  });
+
+  const nextBtn = document.getElementById('quizNextBtn');
+  nextBtn.disabled = true;
+
+  const posInSession = STATE.currentQuizIndex % 5;
+  if (posInSession === 4) {
+    nextBtn.textContent = 'Finish Quiz →';
+  } else {
+    nextBtn.textContent = 'Next Question →';
+  }
+}
+
+function selectOpt(i, correct, el) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  selectedOpt = i;
+
+  const allOpts = document.querySelectorAll('.quiz-opt');
+  allOpts.forEach((o, idx) => {
+    if (idx === correct) o.classList.add('correct');
+    else if (idx === i && i !== correct) o.classList.add('wrong');
+  });
+
+  document.getElementById('quizNextBtn').disabled = false;
+  if (i === correct) STATE.quizScore += 100;
+}
+
+function quizNext() {
+  if (!quizAnswered) { showToast('Please select an answer!'); return; }
+
+  const posInSession = STATE.currentQuizIndex % 5;
+
+  // Show rewarded interstitial on Next button click
+  showRewardedInterstitial(() => {
+    // Give 100 points
+    addPoints(100);
+    STATE.quizDoneToday++;
+    if (STATE.quizDoneToday >= QUIZ_LIMIT && !STATE.quizResetAt) {
+      STATE.quizResetAt = Date.now() + QUIZ_COOLDOWN_MS;
+    }
+    save();
+
+    STATE.currentQuizIndex++;
+    STATE.quizSessionCount++;
+
+    // After every 5 questions, prompt for bonus ad
+    if (posInSession === 4) {
+      showReward(100, () => {
+        // After 5 quiz, push to click next ads
+        setTimeout(() => {
+          if (confirm('🎉 Quiz round complete! Watch a bonus ad for +200 extra pts?')) {
+            showRewardedInterstitial(() => {
+              addPoints(200);
+              showToast('🎁 +200 bonus pts earned!');
+              initQuiz();
+            });
+          } else {
+            initQuiz();
+          }
+        }, 300);
+      });
+    } else {
+      showToast('+100 pts earned!');
+      loadQuizQuestion();
+    }
+  });
+}
+
+// ============================================================
+//  REFERRAL
+// ============================================================
+function renderReferral() {
+  const userId = getUserId();
+  const code = 'PUFF-' + String(userId).slice(-4).toUpperCase().replace(/[^A-Z0-9]/g, 'X');
+  document.getElementById('refCode').textContent = code;
+  document.getElementById('refCount').textContent = STATE.referrals.length;
+
+  const earned = STATE.referrals.length * 500;
+  document.getElementById('refEarned').textContent = earned.toLocaleString() + ' pts';
+
+  const list = document.getElementById('refList');
+  if (STATE.referrals.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px">No referrals yet.<br>Share your link to start earning!</div>';
+    return;
+  }
+  list.innerHTML = '';
+  STATE.referrals.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'ref-item';
+    div.innerHTML = `
+      <div class="ref-avatar">👤</div>
+      <div><div class="ref-name">${r.name}</div><div class="ref-pts">Joined: ${r.date}</div></div>
+      <div class="ref-earned">+500 pts</div>`;
+    list.appendChild(div);
+  });
+}
+
+function copyRef() {
+  const code = document.getElementById('refCode').textContent;
+  const link = `https://t.me/PuffCoinBot?start=${code}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(() => showToast('📋 Link copied!'));
+  } else {
+    showToast('📋 ' + link);
+  }
+}
+
+function shareRef() {
+  const code = document.getElementById('refCode').textContent;
+  const link = `https://t.me/PuffCoinBot?start=${code}`;
+  const text = `🐡 Join PuffCoin Airdrop & earn free crypto!\n\nUse my referral link:\n${link}\n\nEarn 500 pts bonus when you sign up! 🎁`;
+  if (tg && tg.openTelegramLink) {
+    tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+  } else {
+    copyRef();
+    showToast('Link copied — share it to earn!');
+  }
+}
+
+// ============================================================
+//  WITHDRAW
+// ============================================================
+function renderWithdraw() {
+  document.getElementById('wdBalance').textContent = STATE.points.toLocaleString();
+  const list = document.getElementById('wdList');
+  if (STATE.withdrawHistory.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:16px;font-size:13px">No withdrawal history yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  STATE.withdrawHistory.forEach(w => {
+    const div = document.createElement('div');
+    div.className = 'wd-row';
+    div.style.marginBottom = '8px; border-radius:10px';
+    div.innerHTML = `<span class="wd-key">${w.date}<br><small>${w.wallet.slice(0,10)}...</small></span><span class="wd-val" style="color:var(--gold)">${w.pts.toLocaleString()} pts<br><small style="color:var(--muted)">${w.status}</small></span>`;
+    list.appendChild(div);
+  });
+}
+
+function submitWithdraw() {
+  const wallet = document.getElementById('wdWallet').value.trim();
+  const amt = parseInt(document.getElementById('wdAmount').value);
+
+  if (!wallet) { showToast('⚠️ Enter your wallet address'); return; }
+  if (!amt || amt < 10000) { showToast('⚠️ Minimum 10,000 pts required'); return; }
+  if (STATE.points < amt) { showToast('⚠️ Not enough points'); return; }
+
+  STATE.points -= amt;
+  STATE.withdrawHistory.unshift({
+    wallet, pts: amt, date: new Date().toLocaleDateString(), status: 'Pending'
+  });
+  save();
+  renderWithdraw();
+  updateUI();
+
+  document.getElementById('wdWallet').value = '';
+  document.getElementById('wdAmount').value = '';
+  showToast('✅ Withdrawal requested!');
+}
+
+// ============================================================
+//  COOLDOWN TICKER
+// ============================================================
+setInterval(() => {
+  if (isNewsCoolingDown()) {
+    const remaining = STATE.newsResetAt - Date.now();
+    document.getElementById('newsCooldownTime').textContent = formatCountdown(remaining);
+  } else if (STATE.newsResetAt) {
+    STATE.newsResetAt = null;
+    STATE.newsReadToday = 0;
+    save();
+    renderNews();
+  }
+
+  if (isQuizCoolingDown()) {
+    const remaining = STATE.quizResetAt - Date.now();
+    document.getElementById('quizCooldownTime').textContent = formatCountdown(remaining);
+  } else if (STATE.quizResetAt) {
+    STATE.quizResetAt = null;
+    STATE.quizDoneToday = 0;
+    save();
+  }
+}, 1000);
+
+// ============================================================
+//  INIT
+// ============================================================
+load();
+updateUI();
+renderNews();
+
+// Welcome message
+setTimeout(() => {
+  const name = getUsername();
+  showToast('👋 Welcome, ' + name + '!');
+}, 800);
+
+// In-app ad shown periodically
+setInterval(() => {
+  showInterstitialAd();
+}, 5 * 60 * 1000);
+</script>
+</body>
+</html>
