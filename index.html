@@ -9,8 +9,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <!-- Monetag SDK -->
-<script src='//libtl.com/sdk.js' data-zone='11020615' data-sdk='show_11020615' data-app='3337439'></script>
-
+<script src='//libtl.com/sdk.js' data-zone='11020615' data-sdk='show_11020615'></script>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -852,7 +851,7 @@ function completeArticle() {
   if (btn.disabled) return;
 
   // Show rewarded interstitial, then reward
-  showRewardedInterstitial(() => {
+  show_11020615().then(() => {
     if (STATE.articleTimers[currentArticleId] !== 'done') {
       STATE.articleTimers[currentArticleId] = 'done';
       STATE.newsReadToday++;
@@ -974,7 +973,7 @@ function quizNext() {
   const posInSession = STATE.currentQuizIndex % 5;
 
   // Show rewarded interstitial on Next button click
-  showRewardedInterstitial(() => {
+  show_11020615().then(() => {
     // Give 100 points
     addPoints(100);
     STATE.quizDoneToday++;
@@ -992,7 +991,7 @@ function quizNext() {
         // After 5 quiz, push to click next ads
         setTimeout(() => {
           if (confirm('🎉 Quiz round complete! Watch a bonus ad for +200 extra pts?')) {
-            showRewardedInterstitial(() => {
+            show_11020615().then(() => {
               addPoints(200);
               showToast('🎁 +200 bonus pts earned!');
               initQuiz();
