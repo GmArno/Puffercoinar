@@ -821,11 +821,8 @@ function openArticle(news) {
 
   const timer = setInterval(() => {
     timeLeft--;
-    if (!popupShown && timeLeft <= 15) {
-      popupShown = true;
-      // Show rewarded popup at 15s
-      showRewardedPopup(null);
-    }
+    
+      
     if (timeLeft <= 0) {
       clearInterval(timer);
       completeBtn.disabled = false;
@@ -1139,7 +1136,7 @@ setTimeout(() => {
 
 // In-app ad shown periodically
 setInterval(() => {
-  show_11020615({
+  show_11020617({
   type: 'inApp',
   inAppSettings: {
     frequency: 2,
