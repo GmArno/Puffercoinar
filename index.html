@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +9,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <!-- Monetag SDK -->
-<script src='//libtl.com/sdk.js' data-zone='11020615' data-sdk='show_11020615'></script>
+<script src='//libtl.com/sdk.js' data-zone='11020615' data-sdk='show_11020615' data-app='3337439'></script>
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -349,7 +348,7 @@
 <!-- TOP BAR -->
 <div class="top-bar">
   <div class="logo">Puff<span>Coin</span></div>
-  <div class="points-badge"><span class="icon">🪙</span><span id="totalPoints">0</span> pts</div>
+  <div class="points-badge"><span class="icon">🪙</span><span id="totalPoints">0</span> puff</div>
 </div>
 
 <!-- TOAST -->
@@ -1041,7 +1040,7 @@ function renderReferral() {
 
 function copyRef() {
   const code = document.getElementById('refCode').textContent;
-  const link = `https://t.me/PuffCoinBot?start=${code}`;
+  const link = `https://t.me/PuffCoinar_Bot?start=${code}`;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(link).then(() => showToast('📋 Link copied!'));
   } else {
@@ -1051,7 +1050,7 @@ function copyRef() {
 
 function shareRef() {
   const code = document.getElementById('refCode').textContent;
-  const link = `https://t.me/PuffCoinBot?start=${code}`;
+  const link = `https://t.me/PuffCoinar_Bot?start=${code}`;
   const text = `🐡 Join PuffCoin Airdrop & earn free crypto!\n\nUse my referral link:\n${link}\n\nEarn 500 pts bonus when you sign up! 🎁`;
   if (tg && tg.openTelegramLink) {
     tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
