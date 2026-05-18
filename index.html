@@ -1139,8 +1139,16 @@ setTimeout(() => {
 
 // In-app ad shown periodically
 setInterval(() => {
-  showInterstitialAd();
-}, 5 * 60 * 1000);
+  show_11020615({
+  type: 'inApp',
+  inAppSettings: {
+    frequency: 2,
+    capping: 0.1,
+    interval: 30,
+    timeout: 5,
+    everyPage: false
+  }
+});
 </script>
 </body>
 </html>
